@@ -12,6 +12,8 @@ var ColonByte byte = ':'
 var DollerByte byte = '$'
 var StarByte byte = '*'
 var NullByte byte = 0
+var SpaceByte byte = ' '
+var DoubleQuoteByte byte = '"'
 
 /// Command Names 
 var PINGCommand string = "PING"

@@ -1,8 +1,8 @@
 package util
 
 import (
-	"strconv"
 	"bytes"
+	"strconv"
 )
 
 func Deserialize(input []byte, result []any) ([]any, bool) {
@@ -11,6 +11,7 @@ func Deserialize(input []byte, result []any) ([]any, bool) {
 	}
 	var t byte = input[0]
 	var succ bool
+	input_original := input
 	input = input[1:]
 	switch t {
 	case PlusByte:
@@ -26,7 +27,7 @@ func Deserialize(input []byte, result []any) ([]any, bool) {
 	case NullByte:
 		succ = true
 	default:
-		succ = false
+		result, succ = DeserializeInlineCommand(input_original, result)
 	}
 	return result, succ
 }
@@ -83,7 +84,7 @@ func DeserializeBulkString(input []byte, result []any) ([]any, bool) {
 	} else {
 		result, succ = DeserializeString(input, result)
 	}
-	return result, succ 
+	return result, succ
 }
 
 func DeserializeArray(input []byte, result []any) ([]any, bool) {
@@ -100,4 +101,32 @@ func DeserializeArray(input []byte, result []any) ([]any, bool) {
 		result = append(result, nil)
 	}
 	return Deserialize(input, result)
+}
+
+func DeserializeInlineCommand(input []byte, result []any) ([]any, bool) {
+	var insideString bool = false
+	var currBytes []byte
+	for _, inputByte := range input {
+		if inputByte == 0 {
+			break
+		}
+		if inputByte == DoubleQuoteByte {
+			insideString = !insideString
+		} else if inputByte == SpaceByte && !insideString {
+			var subsIndex int = bytes.Index(currBytes, CRLFByte)
+			if subsIndex != -1 {
+				currBytes = currBytes[:len(currBytes)-2]
+			}
+			result = append(result, string(currBytes))
+			currBytes = nil
+		} else {
+			currBytes = append(currBytes, inputByte)
+		}
+	}
+	var subsIndex int = bytes.Index(currBytes, CRLFByte)
+	if subsIndex != -1 {
+		currBytes = currBytes[:len(currBytes)-2]
+	}
+	result = append(result, string(currBytes))
+	return result, true
 }

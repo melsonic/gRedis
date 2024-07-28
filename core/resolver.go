@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"reflect"
 	"strconv"
 	"strings"
@@ -27,6 +28,7 @@ func resolveECHO(input []any) string {
 	if n > 1 {
 		return util.SerializeError(util.WRONG_ARG_NUM_ERROR)
 	} else if n == 0 {
+		fmt.Println("echo : ", input)
 		return util.SerializeError(util.NO_ARG_ERROR)
 	}
 	return util.SerializeBulkString(input[0].(string))
@@ -185,9 +187,11 @@ func resolveRPUSH(input []any) string {
 }
 
 func Resolver(req []any) string {
-	var response string = util.SerializeString("OK")
+	var response string = util.SerializeError("NOT_OK")
 	if len(req) == 0 {
-		return util.SerializeError(util.NO_ARG_ERROR)
+		fmt.Println("req : ", req)
+		// return util.SerializeError(util.NO_ARG_ERROR)
+		return util.SerializeString("OK")
 	}
 	var t string
 	t = strings.ToUpper(req[0].(string))
