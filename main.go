@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/melsonic/gRedis/util"
 	"github.com/melsonic/gRedis/core"
+	"github.com/melsonic/gRedis/util"
 )
 
 func main() {
@@ -20,8 +20,6 @@ func main() {
 		if connErr != nil {
 			panic("Error Setting TCP Connection\n")
 		}
-		go func(conn net.Conn) {
-			core.HandleConnection(conn)
-		}(conn)
+		go core.HandleConnection(conn)
 	}
 }

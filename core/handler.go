@@ -10,7 +10,7 @@ import (
 
 func HandleConnection(conn net.Conn) {
 	defer conn.Close()
-	var buffer []byte = util.EMPTY_READ_BYTE
+	var buffer []byte = make([]byte, 4096)
 	for {
 		util.SetBytesToZero(buffer)
 		_, err := conn.Read(buffer)
@@ -20,14 +20,14 @@ func HandleConnection(conn net.Conn) {
 			} else {
 				fmt.Println("read err : ", err.Error())
 			}
-			break
+			return
 		}
 		requestArray, _ := util.Deserialize(buffer, []any{})
 		response := Resolver(requestArray)
 		_, err = conn.Write([]byte(response))
 		if err != nil {
 			fmt.Println("Write Response Error:", err)
-			break
+			return
 		}
 	}
 }
